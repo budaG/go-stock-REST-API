@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,6 +19,7 @@ type stock struct {
 func main() {
 	router := gin.Default()
 	router.GET("/stocks", getStocks)
+	router.GET("/stocks/:id", getStockById)
 	router.POST("/stocks", addStock)
 
 	router.Run("localhost:7000")
@@ -45,4 +47,22 @@ func addStock(c *gin.Context) {
 	// add stock to the slice.
 	stocks = append(stocks, newStock)
 	c.IndentedJSON(http.StatusCreated, newStock)
+}
+
+func getStockById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message: ": "bad id"})
+		return
+	}
+
+	for _, stock := range stocks {
+		if stock.ID == id {
+			c.IndentedJSON(http.StatusOK, stock)
+			return
+		}
+	}
+
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message: ": "stock not found"})
 }
