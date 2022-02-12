@@ -21,6 +21,7 @@ func main() {
 	router.GET("/stocks", getStocks)
 	router.GET("/stocks/:id", getStockById)
 	router.POST("/stocks", addStock)
+	router.DELETE("/stocks/:id", deleteStockById)
 
 	router.Run("localhost:7000")
 }
@@ -65,4 +66,37 @@ func getStockById(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message: ": "stock not found"})
+}
+
+func deleteStockById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message: ": "bad id"})
+		return
+	}
+
+	exist, resStocks := deleteStock(c, id)
+	stocks = resStocks
+
+	if exist {
+		c.IndentedJSON(http.StatusOK, stocks)
+	} else {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message:": "stock not found"})
+
+	}
+
+}
+
+func deleteStock(c *gin.Context, id int) (bool, []stock) {
+	resStocks := []stock{}
+	exist := false
+	for _, stock := range stocks {
+		if stock.ID == id {
+			exist = true
+		} else {
+			resStocks = append(resStocks, stock)
+		}
+	}
+	return exist, resStocks
 }
