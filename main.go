@@ -18,6 +18,7 @@ type stock struct {
 func main() {
 	router := gin.Default()
 	router.GET("/stocks", getStocks)
+	router.POST("/stocks", addStock)
 
 	router.Run("localhost:7000")
 }
@@ -32,4 +33,16 @@ var stocks = []stock{
 
 func getStocks(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, stocks)
+}
+
+func addStock(c *gin.Context) {
+	var newStock stock
+
+	if err := c.BindJSON(&newStock); err != nil {
+		return
+	}
+
+	// add stock to the slice.
+	stocks = append(stocks, newStock)
+	c.IndentedJSON(http.StatusCreated, newStock)
 }
