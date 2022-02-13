@@ -1,4 +1,4 @@
-package main
+package stock
 
 import (
 	"net/http"
@@ -16,17 +16,6 @@ type stock struct {
 	Low    float64 `json:"low"`
 }
 
-func main() {
-	router := gin.Default()
-	router.GET("/stocks", getStocks)
-	router.GET("/stocks/:id", getStockById)
-	router.POST("/stocks", addStock)
-	router.DELETE("/stocks/:id", deleteStockById)
-	router.POST("/stocks/:id", updateStock)
-
-	router.Run("localhost:7000")
-}
-
 var stocks = []stock{
 	{ID: 1, Name: "Boeing", Symbol: "BA", Open: 218.01, High: 221.41, Low: 210.27},
 	{ID: 2, Name: "Delta Air Lines", Symbol: "DAL", Open: 43.93, High: 44.80, Low: 41.92},
@@ -35,11 +24,11 @@ var stocks = []stock{
 	{ID: 5, Name: "Tesla", Symbol: "TSLA", Open: 909.39, High: 915.96, Low: 850.71},
 }
 
-func getStocks(c *gin.Context) {
+func GetStocks(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, stocks)
 }
 
-func addStock(c *gin.Context) {
+func AddStock(c *gin.Context) {
 	var newStock stock
 
 	if err := c.BindJSON(&newStock); err != nil {
@@ -51,7 +40,7 @@ func addStock(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newStock)
 }
 
-func getStockById(c *gin.Context) {
+func GetStockById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
@@ -69,7 +58,7 @@ func getStockById(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message: ": "stock not found"})
 }
 
-func deleteStockById(c *gin.Context) {
+func DeleteStockById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
@@ -102,7 +91,7 @@ func deleteStock(c *gin.Context, id int) (bool, []stock) {
 	return exist, resStocks
 }
 
-func updateStock(c *gin.Context) {
+func UpdateStock(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
